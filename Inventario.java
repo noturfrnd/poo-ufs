@@ -37,4 +37,13 @@ public class Inventario {
         }
         return listaGuitarraTemp;
     }
+
+    public void editarGuitarra (Guitarra guitarra){
+        if (listaGuitarra.contains(guitarra)){
+            int index = listaGuitarra.indexOf(guitarra);
+            listaGuitarra.set(index, guitarra);
+            return;
+        }
+        System.out.println("Essa guitarra não existe");
+    }
 }

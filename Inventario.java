@@ -19,6 +19,16 @@ public class Inventario {
         }
         listaGuitarra.add(guitarra);
     }
+
+    public void removerGuitarra(String nrSerial) {
+        for (int i = 0; i < listaGuitarra.size(); i++) {
+            if (listaGuitarra.get(i).getSerialNumber().equals(nrSerial)){
+                listaGuitarra.remove(i);
+                return;
+            }
+        }
+        System.out.println("Essa guitarra nao foi encontrada");
+    }
     public Guitarra obterGuitarra(String serialNumber) {
         for (Guitarra guitarra : listaGuitarra) {
             if (guitarra.getSerialNumber().equals(serialNumber)) {
@@ -39,11 +49,8 @@ public class Inventario {
     }
 
     public void editarGuitarra (Guitarra guitarra){
-        if (listaGuitarra.contains(guitarra)){
-            int index = listaGuitarra.indexOf(guitarra);
-            listaGuitarra.set(index, guitarra);
-            return;
-        }
-        System.out.println("Essa guitarra não existe");
+        Guitarra guitarra1 = obterGuitarra(guitarra.getSerialNumber());
+        int index = listaGuitarra.indexOf(guitarra1);
+        listaGuitarra.set(index, guitarra);
     }
 }

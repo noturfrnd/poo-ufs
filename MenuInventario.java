@@ -13,6 +13,8 @@ public class MenuInventario {
                 System.out.println("Digite o preço da guitarra:");
                 Double preco = entrada.nextDouble();
                 System.out.println("Digite o fabricante da guitarra:");
+//                apos nextDouble o scanner pula uma entrada nextLine
+                String temp = entrada.nextLine();
                 String fabricante = entrada.nextLine();
                 System.out.println("Digite o tipo da guitarra:");
                 String tipo = entrada.nextLine();
@@ -34,6 +36,7 @@ public class MenuInventario {
                 System.out.println("Digite o preço da guitarra:");
                 Double preco = entrada.nextDouble();
                 System.out.println("Digite o fabricante da guitarra:");
+                String temp = entrada.nextLine();
                 String fabricante = entrada.nextLine();
                 System.out.println("Digite o tipo da guitarra:");
                 String tipo = entrada.nextLine();
@@ -46,11 +49,11 @@ public class MenuInventario {
             else if (escolha.equals("4")){
                 ArrayList<Guitarra> listaGuitarras = inventario.getListaGuitarra();
                 for (Guitarra guitarra : listaGuitarras){
-                    System.out.println("Numero de Serie: "+ guitarra.getSerialNumber());
+                    System.out.println("{ Numero de Serie: "+ guitarra.getSerialNumber());
                     System.out.println("Tipo: "+ guitarra.getTipo());
                     System.out.println("Modelo: "+ guitarra.getModelo());
                     System.out.println("Fabricante: "+ guitarra.getFabricante());
-                    System.out.println("Preço: "+ guitarra.getPreco().toString());
+                    System.out.println("Preço: "+ guitarra.getPreco().toString() + " },");
                 }
                 escolha = exibirMenu();
             }

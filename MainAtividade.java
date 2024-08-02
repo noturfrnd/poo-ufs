@@ -16,19 +16,20 @@ public class MainAtividade {
 		System.out.println(" ----------------------- Bem vinto a loja! -----------------------");
 		String escolha = loadMenu();
 		while (!escolha.trim().equals("10")) {
-			switch (escolha) {
-				case "1":
+				if(escolha.equals("1")) {
 					System.out.println("Digite o nome do categoria: ");
 					cadastrarCategorias(scanner.nextLine());
 					escolha = loadMenu();
-				case "2":
+				}
+				if(escolha.equals("2")) {
 					System.out.println("Digite o nome do subcategoria: ");
 					String subcategoria = scanner.nextLine();
 					System.out.println("Digite o nome da Categoria Base: ");
 					String categoriaBase = scanner.nextLine();
-					cadastrarSubcategoria(subcategoria, categoriaBase);
+					cadastrarSubcategoria(categoriaBase, subcategoria);
 					escolha = loadMenu();
-				case "3":
+				}
+				if(escolha.equals("3")) {
 					System.out.println("Digite o codigo do produto: ");
 					int codigoProduto = scanner.nextInt();
 					System.out.println("Digite o nome do produto: ");
@@ -39,10 +40,10 @@ public class MainAtividade {
 					scanner.nextLine();
 					System.out.println("Digite a categoria do produto: ");
 					String categoria = scanner.nextLine();
-					cadastrarProduto(codigoProduto,produto,categoria,quantidadeProduto);
+					cadastrarProduto(codigoProduto, produto, categoria, quantidadeProduto);
 					escolha = loadMenu();
-				case "4":
-			}
+				}
+				if(escolha.equals("4")) {}
 		}
 
 	}
@@ -121,12 +122,13 @@ public class MainAtividade {
 		subcategoria.setNomeSubcategoria(nomeSubcategoria);
 		subcategoria.setCategoriaBase(buscarCategoria(nomeCategoria));
 		for (Categoria cat: listaCategorias){
-			if (cat.getNomeCategoria().equals(subcategoria.getNomeCategoria())){
+			if (cat.getNomeCategoria().equals(nomeCategoria)){
 				List<Subcategoria> subcategoriasLista = cat.getListaSubcategorias();
 				subcategoriasLista.add(subcategoria);
 				cat.setListaSubcategorias(subcategoriasLista);
 			}
 		}
+		listaSubCategorias.add(subcategoria);
 		System.out.println("Sub-categoria cadastrada com sucesso.");
 	}
 

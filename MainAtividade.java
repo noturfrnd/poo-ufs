@@ -9,6 +9,7 @@ public class MainAtividade {
 	private static String escolha;
 	public static ArrayList<Categoria> listaCategorias = new ArrayList<>(10);
 	public static ArrayList<Subcategoria> listaSubCategorias = new ArrayList<>(10);
+	public static ArrayList<Cliente> listaClientes = new ArrayList<>(10);
 
 	public static ArrayList<Produto> estoque = new ArrayList<>();
 
@@ -43,11 +44,17 @@ public class MainAtividade {
 					cadastrarProduto(codigoProduto, produto, categoria, quantidadeProduto);
 					escolha = loadMenu();
 				}
-				if(escolha.equals("4")) {}
+				if(escolha.equals("4")) {
+					System.out.println("Digite o nome do cliente: ");
+					String cliente = scanner.nextLine();
+					cadastrarCliente(cliente);
+					escolha = loadMenu();
+				}
 		}
 
 	}
 
+	// Bloco dedicado a buscas
 	public static Categoria buscarCategoria(String busca){
 		for (Categoria cat: listaCategorias){
 			if(cat.getNomeCategoria().equals(busca)){
@@ -66,28 +73,52 @@ public class MainAtividade {
 		return null;
 	}
 
-	public static ArrayList<String> listarSubcategorias(){
+	public static Cliente buscarCliente(String nome){
+		for (Cliente cat: listaClientes){
+			if(cat.getNome().equals(nome)){
+				return cat;
+			}
+		}
+		return null;
+	}
+
+	public static Produto buscarProduto(String nome){
+		for (Produto prod : estoque){
+			if(prod.getNome().equals(nome)){
+				return prod;
+			}
+		}
+		return null;
+	}
+
+	// Bloco dedicado a conversoes
+	public static ArrayList<String> listarSubcategorias(List<Subcategoria> subcategoriasList){
 		ArrayList<String> subcategorias = new ArrayList<>();
-		for (Subcategoria subc: listaSubCategorias){
+		for (Subcategoria subc: subcategoriasList){
 			subcategorias.add(subc.getNomeSubcategoria());
 		}
 		return subcategorias;
 	}
 
-	public static String loadMenu (){
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Digite o numero da ação que deseja:");
-		System.out.println("1 - Cadastrar categoria.");
-		System.out.println("2 - Cadastrar subcategoria.");
-		System.out.println("3 - Cadastrar produto.");
-		System.out.println("4 - Cadastrar cliente.");
-		System.out.println("5 - Realizar pedido.");
-		System.out.println("6 - Consultar pedido.");
-		System.out.println("7 - Listar pedidos.");
-		System.out.println("8 - Consultar estoque.");
-		System.out.println("9 - Repor estoque.");
-		System.out.println("10 - Sair.");
-		return scanner.nextLine();
+	public static ArrayList<String> listarCategoria(){
+		ArrayList<String> categorias = new ArrayList<>();
+		for (Categoria cat: listaCategorias){
+			categorias.add(cat.getNomeCategoria());
+		}
+		return categorias;
+	}
+
+	// Bloco dedicado a cadastro
+	public static void cadastrarCliente(String nome){
+		if (buscarCliente(nome) != null) {
+			System.out.println("Esse cliente ja existe!");
+			return;
+		}
+		Cliente cliente = new Cliente();
+		cliente.setNome(nome);
+		cliente.setId((int) (Math.random() * 100));
+		cliente.setListaPedidosRealizados(new ArrayList<>());
+		System.out.println("Cliente " + nome + " cadastrado com sucesso sob o ID: " + cliente.getId());
 	}
 
 	public static void cadastrarCategorias(String categoriaNome){
@@ -95,7 +126,7 @@ public class MainAtividade {
 		if (buscarCategoria(categoriaNome) == null){
 			categoria.setNomeCategoria(categoriaNome);
 			System.out.println("Agora adicione as sub-categorias que deseja separadas por ',' essas sao as categorias disponíveis: ");
-			System.out.println(listarSubcategorias().toString());
+			System.out.println(listarSubcategorias(listaSubCategorias).toString());
 			String subcategorias = scanner.nextLine();
 			String[] subcategoriasArray = subcategorias.split(",");
 			ArrayList<Subcategoria> subcategoriasLista = new ArrayList<>();
@@ -103,7 +134,7 @@ public class MainAtividade {
 				subcategoriasLista.add(buscarSubCategoria(subcategoria));
 			}
 			categoria.setListaSubcategorias(subcategoriasLista);
-			System.out.println("Sub-categorias adicionadas: " + categoria.getListaSubcategorias().toString());
+			System.out.println("Sub-categorias adicionadas: " + listarSubcategorias(categoria.getListaSubcategorias()).toString());
 			listaCategorias.add(categoria);
 			return;
 		}
@@ -135,9 +166,9 @@ public class MainAtividade {
 	public static void cadastrarProduto(int codigo, String nome, String categoria, int qtdEstoque){
 		for (Produto prod : estoque){
 			if(prod.getCodigo() == codigo){
-				System.out.println("Produto ja existe, deseja atualizar o cadastro? Y/N");
+				System.out.println("Produto ja existe, deseja atualizar o cadastro? S/N");
 				String resposta = scanner.nextLine();
-				if(resposta.toUpperCase().equals("Y")){
+				if(resposta.toUpperCase().equals("S")){
 					prod.setQtdEstoque(qtdEstoque);
 					prod.setCategoria(buscarCategoria(categoria));
 					prod.setNome(nome);
@@ -146,5 +177,65 @@ public class MainAtividade {
 		}
 		Produto produto = new Produto(codigo, nome, buscarCategoria(categoria), qtdEstoque);
 		estoque.add(produto);
+	}
+
+	public static void cadastrarPedido (String nome){
+		Cliente cliente = buscarCliente(nome);
+		if (cliente == null){
+			System.out.println("Cliente não existe!");
+			return;
+		}
+		Scanner entradaProduto = new Scanner(System.in);
+		Boolean addProduto = true;
+		List<Produto> listaProdutos = new ArrayList<>();
+		while (addProduto){
+			System.out.println("Adicione um produto ao pedido:");
+			String nomeProduto = entradaProduto.nextLine();
+			Produto produto = buscarProduto(nomeProduto);
+			if (produto == null){
+				System.out.println("Produto em falta. :(");
+			}else{
+				System.out.println("Quantidade disponível: " + produto.getQtdEstoque());
+			}
+			System.out.println("Quantidade do produto");
+			int quantidade = entradaProduto.nextInt();
+			if (quantidade > produto.getQtdEstoque()){
+				System.out.println("Sinto muito, quantidade excede o estoque atual :(");
+				quantidade = produto.getQtdEstoque();
+			}
+			Produto produtoPedido = produto;
+			listaProdutos.add(produtoPedido);
+			for (Produto produtoProduto: estoque){
+				if (produtoProduto.getCodigo() == produtoPedido.getCodigo()){
+					produtoProduto.setQtdEstoque(produtoProduto.getQtdEstoque() + quantidade);
+				}
+			}
+			System.out.println("Finalizar pedido? S/N");
+			String temp = entradaProduto.nextLine();
+			String finalizarPedido = entradaProduto.nextLine();
+			if (finalizarPedido.toUpperCase().equals("S")){
+				addProduto = false;
+			}
+		}
+		Pedido pedido = new Pedido();
+		pedido.setListaProdutos(listaProdutos);
+		pedido.setPedidoFechado(true);
+	}
+
+	// Bloco dedicado a impressão
+	public static String loadMenu (){
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Digite o numero da ação que deseja:");
+		System.out.println("1 - Cadastrar categoria.");
+		System.out.println("2 - Cadastrar subcategoria.");
+		System.out.println("3 - Cadastrar produto.");
+		System.out.println("4 - Cadastrar cliente.");
+		System.out.println("5 - Realizar pedido.");
+		System.out.println("6 - Consultar pedido.");
+		System.out.println("7 - Listar pedidos.");
+		System.out.println("8 - Consultar estoque.");
+		System.out.println("9 - Repor estoque.");
+		System.out.println("10 - Sair.");
+		return scanner.nextLine();
 	}
 }

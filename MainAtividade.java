@@ -281,6 +281,8 @@ public class MainAtividade {
 		Scanner entradaProduto = new Scanner(System.in);
 		Boolean addProduto = true;
 		List<Produto> listaProdutos = new ArrayList<>();
+		ArrayList<Produto> estoqueTemp = estoque;
+		// adicionar itens ao pedido
 		while (addProduto){
 			System.out.println("Buscar um produto por nome, codigo ou categoria:");
 			String nomeProduto = entradaProduto.nextLine();
@@ -299,14 +301,13 @@ public class MainAtividade {
 					System.out.println("Sinto muito, quantidade excede o estoque atual :(");
 					quantidade = produto.getQtdEstoque();
 				}
-				Produto produtoPedido = produto;
+				Produto produtoPedido = new Produto();
+				produtoPedido.setCodigo(produto.getCodigo());
+				produtoPedido.setNome(produto.getNome());
+				produtoPedido.setPreco(produto.getPreco());
 				produtoPedido.setQtdEstoque(quantidade);
 				listaProdutos.add(produtoPedido);
-				for (Produto produtoProduto: estoque){
-					if (produtoProduto.getCodigo() == produtoPedido.getCodigo()){
-						produtoProduto.setQtdEstoque(produtoProduto.getQtdEstoque() - quantidade);
-					}
-				}
+				produto.setQtdEstoque(produto.getQtdEstoque() - quantidade);
 				}
 			System.out.println("Finalizar pedido? S/N");
 			// quando scanner.nextInt() é executado, pular um scanner.nextLine()

@@ -1,3 +1,5 @@
-public class Admin extends Pessoa{
+import atividadePontuada.Pessoa;
+
+public class Admin extends Pessoa {
     private Boolean logado;
 }

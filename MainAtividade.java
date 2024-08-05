@@ -31,23 +31,45 @@ public class MainAtividade {
 					escolha = loadMenu();
 				}
 				if(escolha.equals("3")) {
-					System.out.println("Digite o codigo do produto: ");
-					int codigoProduto = scanner.nextInt();
-					System.out.println("Digite o nome do produto: ");
-					scanner.nextLine();
-					String produto = scanner.nextLine();
-					System.out.println("Digite a quantidade do produto: ");
-					int quantidadeProduto = scanner.nextInt();
-					scanner.nextLine();
-					System.out.println("Digite a categoria do produto: ");
-					String categoria = scanner.nextLine();
-					cadastrarProduto(codigoProduto, produto, categoria, quantidadeProduto);
+					cadastrarProduto();
 					escolha = loadMenu();
 				}
 				if(escolha.equals("4")) {
 					System.out.println("Digite o nome do cliente: ");
 					String cliente = scanner.nextLine();
 					cadastrarCliente(cliente);
+					escolha = loadMenu();
+				}
+				if(escolha.equals("5")) {
+					System.out.println("Digite o nome do cliente que ira fazer o pedido: ");
+					cadastrarPedido(scanner.nextLine());
+					escolha = loadMenu();
+				}
+				if (escolha.equals("6")) {
+					System.out.println("Digite o numero ID do pedido: ");
+					consultarPedido(scanner.nextInt());
+					escolha = loadMenu();
+				}
+				if (escolha.equals("7")) {
+					System.out.println("Digite o nome do cliente: ");
+					System.out.println(listarPedidosCliente(scanner.nextLine()).toString());
+					escolha = loadMenu();
+				}
+				if (escolha.equals("8")) {
+					System.out.println(listarProduto(estoque).toString());
+					escolha = loadMenu();
+				}
+				if (escolha.equals("9")) {
+					System.out.println("Qual produto deseja repor? ");
+					System.out.println(listarProduto(estoque).toString());
+					System.out.println("Digite o nome do produto: ");
+					String produto = scanner.nextLine();
+					System.out.println("Digite o quantidade do produto: ");
+					int quantidadeProduto = scanner.nextInt();
+					reporProduto(produto, quantidadeProduto);
+					escolha = loadMenu();
+				}
+				else {
 					escolha = loadMenu();
 				}
 		}
@@ -82,20 +104,50 @@ public class MainAtividade {
 		return null;
 	}
 
-	public static Produto buscarProduto(String nome){
+	public static List<Produto> buscarProduto(String nome){
+		List<Produto> produtos = new ArrayList<>();
 		for (Produto prod : estoque){
 			if(prod.getNome().equals(nome)){
-				return prod;
+				produtos.add(prod);
+			} else if ((prod.getCodigo() + "0").equals(nome+"0")) {
+				produtos.add(prod);
+			} else if (prod.getCategoria().getNomeCategoria().equals(nome)) {
+				produtos.add(prod);
 			}
 		}
-		return null;
+		return produtos;
+	}
+
+	public static void consultarPedido (int id){
+		// quando scanner.nextInt() é executado, pular um scanner.nextLine()
+		scanner.nextLine();
+		for(Cliente cliente: listaClientes){
+			if (!cliente.getListaPedidosRealizados().isEmpty()){
+				List<Pedido> pedidos = cliente.getListaPedidosRealizados();
+				for (Pedido pedido: pedidos){
+					if (pedido.getId() == id){
+						double total = 0.0;
+						System.out.println("Pedido id: " + pedido.getId());
+						System.out.println("Cliente: " + cliente.getNome());
+						for (Produto produto: pedido.getListaProdutos()){
+							System.out.println("Produto: " + produto.getNome() + " Preço: " + produto.getPreco() + " Quantidade: " + produto.getQtdEstoque());
+							total += produto.getPreco() * produto.getQtdEstoque();
+						}
+						System.out.println("Total: " + total);
+						return;
+					}
+				}
+			}
+		}
+		System.out.println("Pedido id: " + id + " não existe");
 	}
 
 	// Bloco dedicado a conversoes
 	public static ArrayList<String> listarSubcategorias(List<Subcategoria> subcategoriasList){
 		ArrayList<String> subcategorias = new ArrayList<>();
 		for (Subcategoria subc: subcategoriasList){
-			subcategorias.add(subc.getNomeSubcategoria());
+			if(subc != null){
+			subcategorias.add(subc.getNomeSubcategoria());}
 		}
 		return subcategorias;
 	}
@@ -108,6 +160,24 @@ public class MainAtividade {
 		return categorias;
 	}
 
+	public static ArrayList<String> listarProduto(List<Produto> produtoList){
+		ArrayList<String> produtos = new ArrayList<>();
+		for (Produto prod: produtoList){
+			produtos.add(prod.getNome());
+		}
+		return produtos;
+	}
+
+	public static List<String> listarPedidosCliente(String nomeCliente){
+		List<String> pedidos = new ArrayList<>();
+		Cliente cliente = buscarCliente(nomeCliente);
+		for (Pedido ped: cliente.getListaPedidosRealizados()){
+			String pedido = "Pedido id: " + ped.getId();
+			pedidos.add(pedido);
+		}
+		return pedidos;
+	}
+
 	// Bloco dedicado a cadastro
 	public static void cadastrarCliente(String nome){
 		if (buscarCliente(nome) != null) {
@@ -118,6 +188,7 @@ public class MainAtividade {
 		cliente.setNome(nome);
 		cliente.setId((int) (Math.random() * 100));
 		cliente.setListaPedidosRealizados(new ArrayList<>());
+		listaClientes.add(cliente);
 		System.out.println("Cliente " + nome + " cadastrado com sucesso sob o ID: " + cliente.getId());
 	}
 
@@ -163,19 +234,41 @@ public class MainAtividade {
 		System.out.println("Sub-categoria cadastrada com sucesso.");
 	}
 
-	public static void cadastrarProduto(int codigo, String nome, String categoria, int qtdEstoque){
-		for (Produto prod : estoque){
-			if(prod.getCodigo() == codigo){
-				System.out.println("Produto ja existe, deseja atualizar o cadastro? S/N");
-				String resposta = scanner.nextLine();
-				if(resposta.toUpperCase().equals("S")){
-					prod.setQtdEstoque(qtdEstoque);
-					prod.setCategoria(buscarCategoria(categoria));
-					prod.setNome(nome);
+	public static void cadastrarProduto(){
+		System.out.println("Digite o codigo do produto: ");
+		int codigoProduto = scanner.nextInt();
+		System.out.println("Digite o nome do produto: ");
+		scanner.nextLine();
+		String nomeProduto = scanner.nextLine();
+		System.out.println("Digite a quantidade do produto: ");
+		int quantidadeProduto = scanner.nextInt();
+		// quando scanner.nextInt() é executado, pular um scanner.nextLine()
+		scanner.nextLine();
+		System.out.println("Digite a categoria do produto: ");
+		String categoria = scanner.nextLine();
+		System.out.println("Digite o Preço do produto: ");
+		double precoProduto = scanner.nextDouble();
+		if(!estoque.isEmpty()){
+			for (Produto prod : estoque){
+				if(prod.getCodigo() == codigoProduto){
+					System.out.println("Produto ja existe, deseja atualizar o cadastro? S/N");
+					String resposta = scanner.nextLine();
+					if(resposta.toUpperCase().equals("S")){
+						prod.setQtdEstoque(quantidadeProduto);
+						prod.setCategoria(buscarCategoria(categoria));
+						prod.setNome(nomeProduto);
+						prod.setPreco(precoProduto);
+						return;
+					}else {return;}
 				}
 			}
 		}
-		Produto produto = new Produto(codigo, nome, buscarCategoria(categoria), qtdEstoque);
+		Produto produto = new Produto();
+		produto.setCodigo(codigoProduto);
+		produto.setNome(nomeProduto);
+		produto.setPreco(precoProduto);
+		produto.setQtdEstoque(quantidadeProduto);
+		produto.setCategoria(buscarCategoria(categoria));
 		estoque.add(produto);
 	}
 
@@ -189,37 +282,56 @@ public class MainAtividade {
 		Boolean addProduto = true;
 		List<Produto> listaProdutos = new ArrayList<>();
 		while (addProduto){
-			System.out.println("Adicione um produto ao pedido:");
+			System.out.println("Buscar um produto por nome, codigo ou categoria:");
 			String nomeProduto = entradaProduto.nextLine();
-			Produto produto = buscarProduto(nomeProduto);
-			if (produto == null){
+			List<Produto> produtos = buscarProduto(nomeProduto);
+			Produto produto =  new Produto();
+			if (produtos == null){
 				System.out.println("Produto em falta. :(");
 			}else{
-				System.out.println("Quantidade disponível: " + produto.getQtdEstoque());
-			}
-			System.out.println("Quantidade do produto");
-			int quantidade = entradaProduto.nextInt();
-			if (quantidade > produto.getQtdEstoque()){
-				System.out.println("Sinto muito, quantidade excede o estoque atual :(");
-				quantidade = produto.getQtdEstoque();
-			}
-			Produto produtoPedido = produto;
-			listaProdutos.add(produtoPedido);
-			for (Produto produtoProduto: estoque){
-				if (produtoProduto.getCodigo() == produtoPedido.getCodigo()){
-					produtoProduto.setQtdEstoque(produtoProduto.getQtdEstoque() + quantidade);
+				System.out.println("Esses produtos foram encontrados: " + listarProduto(produtos).toString());
+				System.out.println("Digite o nome do produto que deseja adicionar: ");
+				String nomeProduto1 = entradaProduto.nextLine();
+				produto = buscarProduto(nomeProduto1).get(0);
+				System.out.println("Quantidade do produto");
+				int quantidade = entradaProduto.nextInt();
+				if (quantidade > produto.getQtdEstoque()){
+					System.out.println("Sinto muito, quantidade excede o estoque atual :(");
+					quantidade = produto.getQtdEstoque();
 				}
-			}
+				Produto produtoPedido = produto;
+				produtoPedido.setQtdEstoque(quantidade);
+				listaProdutos.add(produtoPedido);
+				for (Produto produtoProduto: estoque){
+					if (produtoProduto.getCodigo() == produtoPedido.getCodigo()){
+						produtoProduto.setQtdEstoque(produtoProduto.getQtdEstoque() - quantidade);
+					}
+				}
+				}
 			System.out.println("Finalizar pedido? S/N");
+			// quando scanner.nextInt() é executado, pular um scanner.nextLine()
 			String temp = entradaProduto.nextLine();
 			String finalizarPedido = entradaProduto.nextLine();
 			if (finalizarPedido.toUpperCase().equals("S")){
 				addProduto = false;
 			}
-		}
+			}
 		Pedido pedido = new Pedido();
 		pedido.setListaProdutos(listaProdutos);
 		pedido.setPedidoFechado(true);
+		pedido.setId((int) (Math.random() * 100));
+		cliente.getListaPedidosRealizados().add(pedido);
+		System.out.println("Pedido realizado com ID: " + pedido.getId());
+	}
+
+	public static void reporProduto(String nomeProduto, int qntProduto){
+		for (Produto produto : estoque){
+			if (produto.getNome().equals(nomeProduto)){
+				produto.setQtdEstoque(qntProduto);
+				return;
+			}
+		}
+		System.out.println("Produto nao encontrado!");
 	}
 
 	// Bloco dedicado a impressão

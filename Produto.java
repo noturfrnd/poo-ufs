@@ -5,13 +5,16 @@ public class Produto {
 	private String nome;
 	private Categoria categoria;
 	private int qtdEstoque;
+	private double preco;
 
-	public Produto(int codigo, String nome, Categoria categoria, int qtdEstoque){
+	public Produto(int codigo, String nome, Categoria categoria, int qtdEstoque, double preco){
 		this.codigo = codigo;
 		this.nome = nome;
 		this.categoria = categoria;
 		this.qtdEstoque = qtdEstoque;
+		this.preco = preco;
 	}
+	public Produto(){}
 
 	public int getCodigo() {
 		return codigo;
@@ -43,5 +46,13 @@ public class Produto {
 
 	public void setQtdEstoque(int qtdEstoque) {
 		this.qtdEstoque = qtdEstoque;
+	}
+
+	public double getPreco() {
+		return preco;
+	}
+
+	public void setPreco(double preco) {
+		this.preco = preco;
 	}
 }

@@ -56,9 +56,7 @@ public class Lista<T> implements ILista<T>, Iterable<T>{
 
     @Override
     public void limpar() {
-        for (int i = 0; i < valores.size(); i++){
-            valores.remove(i);
-        }
+        valores.clear();
     }
 
     @Override

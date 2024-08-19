@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class TestarLista {
@@ -19,9 +20,17 @@ public class TestarLista {
         listaTeste.remover(listaTeste.obter(5));
         System.out.println("Nova lista: " + listaTeste.toString());
         System.out.println("Remover valores da lista");
-        Lista<Integer> listaTemp = new Lista<>();
-        listaTemp.adicionar(listaTeste.obter(1));
-        listaTemp.adicionar(listaTeste.obter(5));
-        listaTeste.remover((Collection<Integer>) listaTemp);
+        Collection<Integer> collection = new ArrayList<>();
+        collection.add(listaTeste.obter(1));
+        collection.add(listaTeste.obter(5));
+        listaTeste.remover(collection);
+        System.out.println("Nova lista: " + listaTeste.toString());
+        System.out.println("Valor existente na lista? Valor: " + listaTeste.obter(0) + " Existe? " + (listaTeste.contem(listaTeste.obter(0)) ? "Sim" : "Não"));
+        System.out.println("Valor existente na lista? Valor: " + 99 + " Existe? " + (listaTeste.contem(99) ? "Sim" : "Não"));
+        System.out.println("Tamanho da lista: " + listaTeste.tamanho());
+        System.out.println("Limpar lista");
+        System.out.println("Lista: " + listaTeste.toString());
+        listaTeste.limpar();
+        System.out.println("Nova lista: " + listaTeste.toString());
     }
 }

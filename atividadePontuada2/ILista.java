@@ -1,3 +1,5 @@
+package atividadePontuada2;
+
 import java.util.Collection;
 
 public interface ILista<Tipo> {
